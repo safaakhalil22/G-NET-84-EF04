@@ -66,254 +66,254 @@ namespace G_NET_84_EF04
 
         #region Menu Operations
 
-        #region Add Customer
-        static async Task AddCustomerAsync(AppDbContext dbContext)
-        {
-            Console.WriteLine("--- Add New Customer ---");
+        //#region Add Customer
+        //static async Task AddCustomerAsync(AppDbContext dbContext)
+        //{
+        //    Console.WriteLine("--- Add New Customer ---");
 
-            var fullName = ReadText("Full Name", v => v.Length < 3 || v.Length > 150 ? "Full name must be between 3 and 150 characters." : null);
+        //    var fullName = ReadText("Full Name", v => v.Length < 3 || v.Length > 150 ? "Full name must be between 3 and 150 characters." : null);
 
-            var nationalId = ReadText("National ID", v => Regex.IsMatch(v, @"^\d{10,14}$") ? null : "National ID must be 10 to 14 digits.");
-            if (await dbContext.Customers.AnyAsync(c => c.NationalId == nationalId))
-            {
-                PrintError("A customer with this National ID already exists.");
-                return;
-            }
+        //    var nationalId = ReadText("National ID", v => Regex.IsMatch(v, @"^\d{10,14}$") ? null : "National ID must be 10 to 14 digits.");
+        //    if (await dbContext.Customers.AnyAsync(c => c.NationalId == nationalId))
+        //    {
+        //        PrintError("A customer with this National ID already exists.");
+        //        return;
+        //    }
 
-            var dateOfBirth = ReadDateOfBirth("Date of Birth");
+        //    var dateOfBirth = ReadDateOfBirth("Date of Birth");
 
-            var email = ReadText("Email", v => Regex.IsMatch(v, @"^[^@\s]+@[^@\s]+\.[^@\s]+$") && v.Length <= 150 ? null : "Please enter a valid email address.");
+        //    var email = ReadText("Email", v => Regex.IsMatch(v, @"^[^@\s]+@[^@\s]+\.[^@\s]+$") && v.Length <= 150 ? null : "Please enter a valid email address.");
 
-            var phone = ReadText("Phone", v => Regex.IsMatch(v, @"^\+?\d{8,15}$") ? null : "Phone must be 8 to 15 digits (optionally starting with +).");
+        //    var phone = ReadText("Phone", v => Regex.IsMatch(v, @"^\+?\d{8,15}$") ? null : "Phone must be 8 to 15 digits (optionally starting with +).");
 
-            var address = ReadText("Address", v => v.Length < 5 || v.Length > 250 ? "Address must be between 5 and 250 characters." : null);
+        //    var address = ReadText("Address", v => v.Length < 5 || v.Length > 250 ? "Address must be between 5 and 250 characters." : null);
 
-            var customerType = ReadEnum<CustomerType>("Customer Type:");
+        //    var customerType = ReadEnum<CustomerType>("Customer Type:");
 
-            var customer = new Customer
-            {
-                FullName = fullName,
-                NationalId = nationalId,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                PhoneNumber = phone,
-                Address = address,
-                CustomerType = customerType
-            };
+        //    var customer = new Customer
+        //    {
+        //        FullName = fullName,
+        //        NationalId = nationalId,
+        //        DateOfBirth = dateOfBirth,
+        //        Email = email,
+        //        PhoneNumber = phone,
+        //        Address = address,
+        //        CustomerType = customerType
+        //    };
 
-            dbContext.Customers.Add(customer);
-            await dbContext.SaveChangesAsync();
+        //    dbContext.Customers.Add(customer);
+        //    await dbContext.SaveChangesAsync();
 
-            Console.WriteLine();
-            PrintSuccess($"Customer created successfully. CustomerId = {customer.Id}");
-        }
-        #endregion
+        //    Console.WriteLine();
+        //    PrintSuccess($"Customer created successfully. CustomerId = {customer.Id}");
+        //}
+        //#endregion
 
-        #region Open Account
-        static async Task OpenAccountAsync(AppDbContext dbContext)
-        {
-            Console.WriteLine("--- Open New Account ---");
+        //#region Open Account
+        //static async Task OpenAccountAsync(AppDbContext dbContext)
+        //{
+        //    Console.WriteLine("--- Open New Account ---");
 
-            var accountNumber = ReadText("Account Number", v => Regex.IsMatch(v, @"^[A-Za-z0-9-]{4,20}$") ? null : "Account number must be 4 to 20 letters, digits or hyphens.");
-            var accountType = ReadEnum<AccountType>("Account Type:");
-            var branchCode = ReadText("Branch Code", v => v.Length == 0 || v.Length > 10 ? "Please enter a valid branch code." : null).ToUpperInvariant();
-            var customerId = ReadInt("Customer Id");
-            var ownershipType = ReadEnum<OwnershipType>("Ownership Role:");
+        //    var accountNumber = ReadText("Account Number", v => Regex.IsMatch(v, @"^[A-Za-z0-9-]{4,20}$") ? null : "Account number must be 4 to 20 letters, digits or hyphens.");
+        //    var accountType = ReadEnum<AccountType>("Account Type:");
+        //    var branchCode = ReadText("Branch Code", v => v.Length == 0 || v.Length > 10 ? "Please enter a valid branch code." : null).ToUpperInvariant();
+        //    var customerId = ReadInt("Customer Id");
+        //    var ownershipType = ReadEnum<OwnershipType>("Ownership Role:");
 
-            PrintInfo($"Validating branch '{branchCode}' and customer #{customerId}...");
+        //    PrintInfo($"Validating branch '{branchCode}' and customer #{customerId}...");
 
-            var branch = await dbContext.Branches.FirstOrDefaultAsync(b => b.Code == branchCode);
-            if (branch is null)
-            {
-                PrintError($"Branch '{branchCode}' does not exist.");
-                return;
-            }
+        //    var branch = await dbContext.Branches.FirstOrDefaultAsync(b => b.Code == branchCode);
+        //    if (branch is null)
+        //    {
+        //        PrintError($"Branch '{branchCode}' does not exist.");
+        //        return;
+        //    }
 
-            var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
-            if (customer is null)
-            {
-                PrintError($"Customer #{customerId} does not exist.");
-                return;
-            }
+        //    var customer = await dbContext.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
+        //    if (customer is null)
+        //    {
+        //        PrintError($"Customer #{customerId} does not exist.");
+        //        return;
+        //    }
 
-            var account = await dbContext.Accounts
-                                         .Include(a => a.CustomerAccounts)
-                                         .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+        //    var account = await dbContext.Accounts
+        //                                 .Include(a => a.CustomerAccounts)
+        //                                 .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
-            if (account is null)
-            {
-                if (ownershipType == OwnershipType.CoHolder)
-                {
-                    PrintError("A new account must be opened with a Primary owner first.");
-                    return;
-                }
+        //    if (account is null)
+        //    {
+        //        if (ownershipType == OwnershipType.CoHolder)
+        //        {
+        //            PrintError("A new account must be opened with a Primary owner first.");
+        //            return;
+        //        }
 
-                account = new Account
-                {
-                    AccountNumber = accountNumber,
-                    AccountType = accountType,
-                    BranchCode = branch.Code,
-                    CurrentBalance = 0,
-                    OpeningDate = DateOnly.FromDateTime(DateTime.Today)
-                };
+        //        account = new Account
+        //        {
+        //            AccountNumber = accountNumber,
+        //            AccountType = accountType,
+        //            BranchCode = branch.Code,
+        //            CurrentBalance = 0,
+        //            OpeningDate = DateOnly.FromDateTime(DateTime.Today)
+        //        };
 
-                account.CustomerAccounts.Add(new CustomerAccount
-                {
-                    CustomerId = customer.Id,
-                    OwnershipType = ownershipType,
-                    OwnershipStartDate = DateOnly.FromDateTime(DateTime.Today),
-                    AccountStatus = AccountStatus.Active
-                });
+        //        account.CustomerAccounts.Add(new CustomerAccount
+        //        {
+        //            CustomerId = customer.Id,
+        //            OwnershipType = ownershipType,
+        //            OwnershipStartDate = DateOnly.FromDateTime(DateTime.Today),
+        //            AccountStatus = AccountStatus.Active
+        //        });
 
-                dbContext.Accounts.Add(account);
-                await dbContext.SaveChangesAsync();
+        //        dbContext.Accounts.Add(account);
+        //        await dbContext.SaveChangesAsync();
 
-                PrintSuccess($"Account '{accountNumber}' created and linked to customer {customer.Id} as {ownershipType} owner.");
-                return;
-            }
+        //        PrintSuccess($"Account '{accountNumber}' created and linked to customer {customer.Id} as {ownershipType} owner.");
+        //        return;
+        //    }
 
-            if (account.BranchCode != branch.Code || account.AccountType != accountType)
-            {
-                PrintError($"Account '{accountNumber}' already exists as a {account.AccountType} account at branch '{account.BranchCode}'.");
-                return;
-            }
+        //    if (account.BranchCode != branch.Code || account.AccountType != accountType)
+        //    {
+        //        PrintError($"Account '{accountNumber}' already exists as a {account.AccountType} account at branch '{account.BranchCode}'.");
+        //        return;
+        //    }
 
-            if (account.CustomerAccounts.Any(ca => ca.CustomerId == customer.Id))
-            {
-                PrintError($"Customer #{customer.Id} is already linked to account '{accountNumber}'.");
-                return;
-            }
+        //    if (account.CustomerAccounts.Any(ca => ca.CustomerId == customer.Id))
+        //    {
+        //        PrintError($"Customer #{customer.Id} is already linked to account '{accountNumber}'.");
+        //        return;
+        //    }
 
-            if (ownershipType == OwnershipType.Primary && account.CustomerAccounts.Any(ca => ca.OwnershipType == OwnershipType.Primary))
-            {
-                PrintError($"Account '{accountNumber}' already has a Primary owner.");
-                return;
-            }
+        //    if (ownershipType == OwnershipType.Primary && account.CustomerAccounts.Any(ca => ca.OwnershipType == OwnershipType.Primary))
+        //    {
+        //        PrintError($"Account '{accountNumber}' already has a Primary owner.");
+        //        return;
+        //    }
 
-            account.CustomerAccounts.Add(new CustomerAccount
-            {
-                CustomerId = customer.Id,
-                OwnershipType = ownershipType,
-                OwnershipStartDate = DateOnly.FromDateTime(DateTime.Today),
-                AccountStatus = AccountStatus.Active
-            });
+        //    account.CustomerAccounts.Add(new CustomerAccount
+        //    {
+        //        CustomerId = customer.Id,
+        //        OwnershipType = ownershipType,
+        //        OwnershipStartDate = DateOnly.FromDateTime(DateTime.Today),
+        //        AccountStatus = AccountStatus.Active
+        //    });
 
-            await dbContext.SaveChangesAsync();
+        //    await dbContext.SaveChangesAsync();
 
-            PrintSuccess($"Existing account '{accountNumber}' linked to customer {customer.Id} as {ownershipType} owner.");
-        }
-        #endregion
+        //    PrintSuccess($"Existing account '{accountNumber}' linked to customer {customer.Id} as {ownershipType} owner.");
+        //}
+        //#endregion
 
-        #region Update Account Status
-        static async Task UpdateAccountStatusAsync(AppDbContext dbContext)
-        {
-            Console.WriteLine("--- Update Account Status ---");
+        //#region Update Account Status
+        //static async Task UpdateAccountStatusAsync(AppDbContext dbContext)
+        //{
+        //    Console.WriteLine("--- Update Account Status ---");
 
-            var accountNumber = ReadText("Account Number", v => v.Length == 0 ? "Account number is required." : null);
-            var customerId = ReadInt("Customer Id");
-            var newStatus = ReadEnum<AccountStatus>("New Status:");
+        //    var accountNumber = ReadText("Account Number", v => v.Length == 0 ? "Account number is required." : null);
+        //    var customerId = ReadInt("Customer Id");
+        //    var newStatus = ReadEnum<AccountStatus>("New Status:");
 
-            var customerAccount = await dbContext.CustomerAccounts
-                                                 .FirstOrDefaultAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId == customerId);
+        //    var customerAccount = await dbContext.CustomerAccounts
+        //                                         .FirstOrDefaultAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId == customerId);
 
-            if (customerAccount is null)
-            {
-                PrintError($"Customer #{customerId} is not linked to account '{accountNumber}'.");
-                return;
-            }
+        //    if (customerAccount is null)
+        //    {
+        //        PrintError($"Customer #{customerId} is not linked to account '{accountNumber}'.");
+        //        return;
+        //    }
 
-            if (customerAccount.AccountStatus == newStatus)
-            {
-                PrintInfo($"The account is already {newStatus}. Nothing changed.");
-                return;
-            }
+        //    if (customerAccount.AccountStatus == newStatus)
+        //    {
+        //        PrintInfo($"The account is already {newStatus}. Nothing changed.");
+        //        return;
+        //    }
 
-            customerAccount.AccountStatus = newStatus;
-            await dbContext.SaveChangesAsync();
+        //    customerAccount.AccountStatus = newStatus;
+        //    await dbContext.SaveChangesAsync();
 
-            PrintSuccess($"Status updated to {newStatus}.");
-        }
-        #endregion
+        //    PrintSuccess($"Status updated to {newStatus}.");
+        //}
+        //#endregion
 
-        #region Remove Account From Customer
-        static async Task RemoveAccountFromCustomerAsync(AppDbContext dbContext)
-        {
-            Console.WriteLine("--- Remove Account From Customer ---");
+        //#region Remove Account From Customer
+        //static async Task RemoveAccountFromCustomerAsync(AppDbContext dbContext)
+        //{
+        //    Console.WriteLine("--- Remove Account From Customer ---");
 
-            var accountNumber = ReadText("Account Number", v => v.Length == 0 ? "Account number is required." : null);
-            var customerId = ReadInt("Customer Id");
+        //    var accountNumber = ReadText("Account Number", v => v.Length == 0 ? "Account number is required." : null);
+        //    var customerId = ReadInt("Customer Id");
 
-            var customerAccount = await dbContext.CustomerAccounts
-                                                 .Include(ca => ca.Account)
-                                                 .FirstOrDefaultAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId == customerId);
+        //    var customerAccount = await dbContext.CustomerAccounts
+        //                                         .Include(ca => ca.Account)
+        //                                         .FirstOrDefaultAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId == customerId);
 
-            if (customerAccount is null)
-            {
-                PrintError($"Customer #{customerId} is not linked to account '{accountNumber}'.");
-                return;
-            }
+        //    if (customerAccount is null)
+        //    {
+        //        PrintError($"Customer #{customerId} is not linked to account '{accountNumber}'.");
+        //        return;
+        //    }
 
-            var hasOtherOwners = await dbContext.CustomerAccounts
-                                                .AnyAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId != customerId);
+        //    var hasOtherOwners = await dbContext.CustomerAccounts
+        //                                        .AnyAsync(ca => ca.AccountNumber == accountNumber && ca.CustomerId != customerId);
 
-            var hasTransactions = await dbContext.Transactions
-                                                 .AnyAsync(t => t.AccountNumber == accountNumber);
+        //    var hasTransactions = await dbContext.Transactions
+        //                                         .AnyAsync(t => t.AccountNumber == accountNumber);
 
-            dbContext.CustomerAccounts.Remove(customerAccount);
+        //    dbContext.CustomerAccounts.Remove(customerAccount);
 
-            var removeAccount = !hasOtherOwners && !hasTransactions;
-            if (removeAccount)
-                dbContext.Accounts.Remove(customerAccount.Account);
+        //    var removeAccount = !hasOtherOwners && !hasTransactions;
+        //    if (removeAccount)
+        //        dbContext.Accounts.Remove(customerAccount.Account);
 
-            await dbContext.SaveChangesAsync();
+        //    await dbContext.SaveChangesAsync();
 
-            Console.WriteLine();
-            PrintSuccess("  Ownership link deleted.");
+        //    Console.WriteLine();
+        //    PrintSuccess("  Ownership link deleted.");
 
-            if (removeAccount)
-                PrintInfo($"      That was the last owner - account '{accountNumber}' was also removed.");
-            else if (!hasOtherOwners)
-                PrintInfo($"      That was the last owner - account '{accountNumber}' was kept because it has transaction history.");
-        }
-        #endregion
+        //    if (removeAccount)
+        //        PrintInfo($"      That was the last owner - account '{accountNumber}' was also removed.");
+        //    else if (!hasOtherOwners)
+        //        PrintInfo($"      That was the last owner - account '{accountNumber}' was kept because it has transaction history.");
+        //}
+        //#endregion
 
-        #region List Customers
-        static async Task ListCustomersAsync(AppDbContext dbContext)
-        {
-            var customers = await dbContext.Customers
-                                           .Include(c => c.CustomerAccounts)
-                                           .ThenInclude(ca => ca.Account)
-                                           .ThenInclude(a => a.Branch)
-                                           .OrderBy(c => c.Id)
-                                           .ToListAsync();
+        //#region List Customers
+        //static async Task ListCustomersAsync(AppDbContext dbContext)
+        //{
+        //    var customers = await dbContext.Customers
+        //                                   .Include(c => c.CustomerAccounts)
+        //                                   .ThenInclude(ca => ca.Account)
+        //                                   .ThenInclude(a => a.Branch)
+        //                                   .OrderBy(c => c.Id)
+        //                                   .ToListAsync();
 
-            Console.WriteLine("--- All Customers ---");
-            Console.WriteLine();
+        //    Console.WriteLine("--- All Customers ---");
+        //    Console.WriteLine();
 
-            if (customers.Count == 0)
-            {
-                Console.WriteLine("  (no customers)");
-                return;
-            }
+        //    if (customers.Count == 0)
+        //    {
+        //        Console.WriteLine("  (no customers)");
+        //        return;
+        //    }
 
-            foreach (var customer in customers)
-            {
-                Console.WriteLine($"  #{customer.Id} {customer.FullName} ({customer.CustomerType})");
+        //    foreach (var customer in customers)
+        //    {
+        //        Console.WriteLine($"  #{customer.Id} {customer.FullName} ({customer.CustomerType})");
 
-                if (customer.CustomerAccounts.Count == 0)
-                {
-                    Console.WriteLine("      (no accounts)");
-                    continue;
-                }
+        //        if (customer.CustomerAccounts.Count == 0)
+        //        {
+        //            Console.WriteLine("      (no accounts)");
+        //            continue;
+        //        }
 
-                foreach (var customerAccount in customer.CustomerAccounts)
-                {
-                    var account = customerAccount.Account;
-                    Console.WriteLine($"      {account.AccountNumber,-10} {account.AccountType,-9} Balance: {account.CurrentBalance,12:N2}   {customerAccount.OwnershipType,-8} {customerAccount.AccountStatus,-7} @ {account.Branch.Name}");
-                }
-            }
-        }
-        #endregion
+        //        foreach (var customerAccount in customer.CustomerAccounts)
+        //        {
+        //            var account = customerAccount.Account;
+        //            Console.WriteLine($"      {account.AccountNumber,-10} {account.AccountType,-9} Balance: {account.CurrentBalance,12:N2}   {customerAccount.OwnershipType,-8} {customerAccount.AccountStatus,-7} @ {account.Branch.Name}");
+        //        }
+        //    }
+        //}
+        //#endregion
 
         #endregion
 
